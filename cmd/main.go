@@ -7,11 +7,20 @@ import (
 )
 
 func main() {
-	pagecontent, err := bargainhunter.Fetch("https://www.amazon.com/Ubiquiti-Security-Gateway-USG-PRO-4-Renewed/dp/B07MC83QR4/")
+	if len(os.Args) < 2 {
+		fmt.Fprintf(os.Stderr, "Usage: %s PRODUCT_PAGE_URL\n", os.Args[0])
+		os.Exit(1)
+	}
+	url := os.Args[1]
+	pagecontent, err := bargainhunter.Fetch(url)
 	if err != nil {
 		fmt.Printf("Something went wrong with Fetch: %s\n", err)
 		os.Exit(1)
 	}
-
-	fmt.Println(pagecontent[:100], "...")
+	price, err := bargainhunter.ExtractPrice(pagecontent)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	fmt.Printf("Available now! Just $%.2f\n", price)
 }
